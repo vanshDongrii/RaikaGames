@@ -96,7 +96,7 @@ export function GameProvider({ children }) {
       headers['x-telegram-init-data'] = initData;
     }
     if (tgUser) {
-      headers['x-dev-telegram-user'] = JSON.stringify(tgUser);
+      headers['x-dev-telegram-user'] = encodeURIComponent(JSON.stringify(tgUser));
     }
     return headers;
   }, [initData, tgUser]);
@@ -137,7 +137,7 @@ export function GameProvider({ children }) {
   }, []);
 
   // Execute Bet
-  const executeBet = async ({ betAmount, gameType = 'chicken_shoot', targetPreference = 'auto' }) => {
+  const executeBet = async ({ betAmount, gameType = 'chicken_shoot', targetPreference = 'auto', multiplier = null }) => {
     try {
       const res = await fetch('/api/game/bet', {
         method: 'POST',
@@ -147,6 +147,7 @@ export function GameProvider({ children }) {
           gameType,
           isDemo,
           targetPreference,
+          multiplier,
         }),
       });
 
@@ -168,6 +169,51 @@ export function GameProvider({ children }) {
       }
 
       if (data.won) {
+        triggerHaptic('heavy');
+      } else {
+        triggerHaptic('light');
+      }
+
+      return data;
+    } catch (err) {
+      triggerNotificationHaptic('error');
+      throw err;
+    }
+  };
+
+  // Settle Bet for interactive games (Mines, TicTacToe, ReactionTest, MemoryMatch)
+  const settleBet = async ({ gameType, betAmount, multiplier = 0, won = false, outcomeDetails = {} }) => {
+    try {
+      const res = await fetch('/api/game/settle', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          betAmount,
+          gameType,
+          multiplier,
+          won,
+          isDemo,
+          outcomeDetails,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to settle game bet');
+      }
+
+      if (isDemo) {
+        setUserProfile(prev => ({ ...prev, demoBalance: data.balance }));
+      } else {
+        setUserProfile(prev => ({
+          ...prev,
+          balance: data.balance,
+          totalWagered: prev.totalWagered + betAmount,
+          totalWon: won ? prev.totalWon + data.payout : prev.totalWon,
+        }));
+      }
+
+      if (won) {
         triggerHaptic('heavy');
       } else {
         triggerHaptic('light');
@@ -320,6 +366,7 @@ export function GameProvider({ children }) {
         autoplayConfig,
         setAutoplayConfig,
         executeBet,
+        settleBet,
         handleDeposit,
         handleWithdraw,
         handleDailyClaim,

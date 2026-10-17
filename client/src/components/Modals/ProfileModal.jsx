@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { X, Award, TrendingUp, DollarSign, RefreshCw, Gift, Shield } from 'lucide-react';
+import { X, Award, TrendingUp, DollarSign, RefreshCw, Gift, Shield, CreditCard, ArrowDownToLine } from 'lucide-react';
 import { useGame } from '../../context/GameContext';
 import { playTapSound } from '../../utils/audio';
 import { triggerHaptic } from '../../utils/telegram';
 
 export default function ProfileModal() {
-  const { modalState, closeModal, userProfile, handleFaucet } = useGame();
+  const { modalState, closeModal, openModal, userProfile, handleFaucet } = useGame();
   const [transactions, setTransactions] = useState([]);
   const [faucetLoading, setFaucetLoading] = useState(false);
 
@@ -129,6 +129,32 @@ export default function ProfileModal() {
                 ${userProfile.totalWon.toFixed(2)}
               </span>
             </div>
+          </div>
+
+          {/* Quick Cashier Action Buttons */}
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => {
+                playTapSound();
+                closeModal('profile');
+                openModal('deposit');
+              }}
+              className="py-2.5 px-3 rounded-xl bg-raika-blue hover:bg-blue-600 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-glow-cyan active:scale-95 transition"
+            >
+              <CreditCard className="w-4 h-4" />
+              <span>Deposit Real</span>
+            </button>
+            <button
+              onClick={() => {
+                playTapSound();
+                closeModal('profile');
+                openModal('withdraw');
+              }}
+              className="py-2.5 px-3 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 font-extrabold text-xs flex items-center justify-center gap-1.5 active:scale-95 transition"
+            >
+              <ArrowDownToLine className="w-4 h-4" />
+              <span>Withdraw Vault</span>
+            </button>
           </div>
 
           {/* Test Balance Faucet Buttons */}

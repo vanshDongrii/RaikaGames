@@ -7,6 +7,7 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true,
+    allowedHosts: ['prefix-suds-pleat.ngrok-free.dev'],
     proxy: {
       '/api': {
         target: 'http://localhost:5000',

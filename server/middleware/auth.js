@@ -76,7 +76,13 @@ export async function telegramAuthMiddleware(req, res, next) {
       const devHeader = req.headers['x-dev-telegram-user'];
       if (devHeader) {
         try {
-          tgUser = JSON.parse(devHeader);
+          if (devHeader.startsWith('%7B') || devHeader.includes('%22')) {
+            tgUser = JSON.parse(decodeURIComponent(devHeader));
+          } else if (!devHeader.startsWith('{')) {
+            tgUser = JSON.parse(Buffer.from(devHeader, 'base64').toString('utf8'));
+          } else {
+            tgUser = JSON.parse(devHeader);
+          }
         } catch {
           // ignore error
         }

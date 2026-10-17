@@ -68,12 +68,12 @@ async function getOrCreateUserData(fromUser) {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'x-dev-telegram-user': JSON.stringify({
+        'x-dev-telegram-user': encodeURIComponent(JSON.stringify({
           id: fromUser.id,
           username: fromUser.username || `user_${fromUser.id}`,
           first_name: fromUser.first_name,
           last_name: fromUser.last_name,
-        }),
+        })),
       },
     });
     if (res.ok) {
@@ -230,11 +230,11 @@ Level up your VIP tier by playing Raika Originals!`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-dev-telegram-user': JSON.stringify({
+          'x-dev-telegram-user': encodeURIComponent(JSON.stringify({
             id: ctx.from.id,
             username: ctx.from.username,
             first_name: ctx.from.first_name,
-          }),
+          })),
         },
       });
 

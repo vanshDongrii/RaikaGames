@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import ngrok from '@ngrok/ngrok';
 import userRoutes from './routes/user.js';
 import walletRoutes from './routes/wallet.js';
 import gameRoutes from './routes/game.js';
@@ -49,4 +50,19 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`🚀 Raika Game API Server running on port ${PORT}`);
   console.log(`🔗 Health check available at http://localhost:${PORT}/api/health`);
+
+  if (!process.env.NGROK_AUTHTOKEN) {
+    console.warn('NGROK_AUTHTOKEN is not set; skipping ngrok tunnel.');
+    return;
+  }
+
+  ngrok.forward({
+    addr: 'localhost:5173',
+    authtoken_from_env: true,
+    domain: 'prefix-suds-pleat.ngrok-free.dev',
+  }).then((forwarder) => {
+    console.log(`Mini App available at: ${forwarder.url()}`);
+  }).catch((error) => {
+    console.error('Could not start ngrok tunnel:', error.message);
+  });
 });

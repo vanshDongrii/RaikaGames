@@ -8,12 +8,14 @@ export default {
     extend: {
       colors: {
         raika: {
-          dark: '#0a0d14',
-          card: '#121622',
-          surface: '#181e2e',
-          border: '#242d45',
-          hover: '#2a3450',
-          accent: '#10b981',
+          dark: '#080b11',
+          card: '#121724',
+          surface: '#182032',
+          border: '#202a42',
+          hover: '#242e48',
+          blue: '#007aff',
+          'blue-hover': '#1a88ff',
+          accent: '#007aff',
           gold: '#fbbf24',
           ruby: '#f43f5e',
           cyan: '#06b6d4',
